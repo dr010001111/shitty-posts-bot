@@ -8,7 +8,7 @@ import relativeTime = require('dayjs/plugin/relativeTime');
 import updateLocale = require('dayjs/plugin/updateLocale');
 
 import dayjs = require('dayjs');
-import { PostType, RantType } from 'ts-devrant';
+import { RantType } from 'ts-devrant';
 
 dayjs.extend(updateLocale);
 dayjs.extend(relativeTime);
@@ -24,13 +24,13 @@ const args = arg({
 });
 
 const shittyCodingInstaProfiles = [
-    "https://www.instagram.com/meme_coding/?hl=de",
-    "https://www.instagram.com/_codehub_/?hl=de",
-    "https://www.instagram.com/programmermemes__/",
-    "https://www.instagram.com/coderhumor/",
-    "https://www.instagram.com/programmer.me/",
-    "https://www.instagram.com/pycoders/",
-    "https://www.instagram.com/programer.life/"
+    "https://www.instagram.com/meme_coding/?__a=1",
+    "https://www.instagram.com/_codehub_/?__a=1",
+    "https://www.instagram.com/programmermemes__/?__a=1",
+    "https://www.instagram.com/coderhumor/?__a=1",
+    "https://www.instagram.com/programmer.me/?__a=1",
+    "https://www.instagram.com/pycoders/?__a=1",
+    "https://www.instagram.com/programer.life/?__a=1"
 ]
 
 function randomOfList<T>(list: T[]): T {
@@ -43,13 +43,9 @@ function randomOfList<T>(list: T[]): T {
 
 async function getRandomPostFromInsta(instaUrl) {
     const instaProfileResponse = await fetch(instaUrl);
-    const instaDocumentText = await instaProfileResponse.text() as unknown as typeof String & { matchAll: Function };
+    const json = await instaProfileResponse.json()
 
-    const shittyMemes: string[] = Array.from(
-        instaDocumentText.matchAll(/"display_url":"([^"]*)/gm)
-    ).map(match => match[1])
-
-    return randomOfList(shittyMemes);
+    return randomOfList<any>(json.graphql.user.edge_owner_to_timeline_media.edges).node.display_url;
 }
 
 async function getRandomMemeToPost() {
@@ -88,8 +84,8 @@ async function postShittyMeme() {
     const memeImageStream = await getRandomMemeToPost();
     const memeReaction = createRandomMemeReaction();
 
-    // const response = await devRant.postRant(memeReaction, [], RantType.JokeMeme, memeImageStream, token)
-    // console.log('Posted shitty meme!', response)
+    const response = await devRant.postRant(memeReaction, [], RantType.JokeMeme, memeImageStream, token)
+    console.log('Posted shitty meme!', response)
 }
 
 async function setupPostingShittyMemesTimer() {
@@ -110,12 +106,12 @@ async function main({
     "--username": username,
     "--password": password
 }: { [key: string]: any }) {
-    // const session = await devRant.login(username, password);
-    // token = session.auth_token
+    const session = await devRant.login(username, password);
+    token = session.auth_token
 
-    // if (session.success) {
-    //     console.log('Logged in! Posting shitty memes now...')
-    // }
+    if (session.success) {
+        console.log('Logged in! Posting shitty memes now...')
+    }
 
     setupPostingShittyMemesTimer()
 }

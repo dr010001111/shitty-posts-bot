@@ -57,6 +57,7 @@ async function getRandomMemeToPost() {
     const randomImageMeme = await getRandomPostFromInsta(candidate);
 
     const srcURL = randomImageMeme.replace(/\\u0026/gi, '&');
+    console.log(srcURL);
 
     const image = await fetch(srcURL)
     return image.buffer();
@@ -87,8 +88,8 @@ async function postShittyMeme() {
     const memeImageStream = await getRandomMemeToPost();
     const memeReaction = createRandomMemeReaction();
 
-    const response = await devRant.postRant(memeReaction, [], RantType.JokeMeme, memeImageStream, token)
-    console.log('Posted shitty meme!', response)
+    // const response = await devRant.postRant(memeReaction, [], RantType.JokeMeme, memeImageStream, token)
+    // console.log('Posted shitty meme!', response)
 }
 
 async function setupPostingShittyMemesTimer() {
@@ -109,12 +110,12 @@ async function main({
     "--username": username,
     "--password": password
 }: { [key: string]: any }) {
-    const session = await devRant.login(username, password);
-    token = session.auth_token
+    // const session = await devRant.login(username, password);
+    // token = session.auth_token
 
-    if (session.success) {
-        console.log('Logged in! Posting shitty memes now...')
-    }
+    // if (session.success) {
+    //     console.log('Logged in! Posting shitty memes now...')
+    // }
 
     setupPostingShittyMemesTimer()
 }
